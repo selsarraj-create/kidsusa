@@ -49,7 +49,7 @@ export function AgeDivisions() {
                         </div>
                         <div className="relative z-10">
                             <div className="inline-flex items-center gap-2 bg-brand-blue text-white font-black px-4 py-2 rounded-full mb-6 text-sm uppercase tracking-wide">
-                                Ages 11 - 16
+                                Ages 11 - 17
                             </div>
                             <h3 className="text-3xl font-black text-gray-900 mb-4">The Editorial Professional</h3>
                             <p className="text-gray-700 font-medium text-lg mb-8 leading-relaxed">

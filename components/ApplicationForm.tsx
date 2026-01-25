@@ -135,13 +135,13 @@ export function ApplicationForm() {
                                         <option key={age} value={age}>{age} Years</option>
                                     ))}
                                 </optgroup>
-                                <optgroup label="Secondary (11-16)">
-                                    {[11, 12, 13, 14, 15, 16].map((age) => (
+                                <optgroup label="Secondary (11-17)">
+                                    {[11, 12, 13, 14, 15, 16, 17].map((age) => (
                                         <option key={age} value={age}>{age} Years</option>
                                     ))}
                                 </optgroup>
                                 <optgroup label="Other">
-                                    {[0, 1, 2, 3, 4, 17, 18].map((age) => (
+                                    {[0, 1, 2, 3, 4, 18].map((age) => (
                                         <option key={age} value={age}>{age} Years</option>
                                     ))}
                                 </optgroup>
