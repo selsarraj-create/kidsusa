@@ -4,10 +4,10 @@ import React from 'react'
 import Image from 'next/image'
 
 const portfolioImages = [
-    "/profile-leo.png",
-    "/profile-bella.png",
-    "/profile-noah.png",
-    "/hero-child.png",
+    "/portfolio-kid.png",
+    "/portfolio-teen.png",
+    "/hero-teen-lifestyle.png",
+    "/profile-leo.png", // Keep some legacy for variety if needed, or remove if they look too babyish. Let's keep one.
 ]
 
 export function InfinitePortfolio() {

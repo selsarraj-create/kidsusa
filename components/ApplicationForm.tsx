@@ -127,11 +127,24 @@ export function ApplicationForm() {
                                     errors.age && "border-red-500 ring-red-500"
                                 )}
                                 {...register('age')}
+                                defaultValue="7" // Default to typical starting age
                             >
-                                <option value="" disabled selected>Age</option>
-                                {[...Array(18)].map((_, i) => (
-                                    <option key={i} value={i}>{i} Years</option>
-                                ))}
+                                <option value="" disabled>Age</option>
+                                <optgroup label="Primary (5-10)">
+                                    {[5, 6, 7, 8, 9, 10].map((age) => (
+                                        <option key={age} value={age}>{age} Years</option>
+                                    ))}
+                                </optgroup>
+                                <optgroup label="Secondary (11-16)">
+                                    {[11, 12, 13, 14, 15, 16].map((age) => (
+                                        <option key={age} value={age}>{age} Years</option>
+                                    ))}
+                                </optgroup>
+                                <optgroup label="Other">
+                                    {[0, 1, 2, 3, 4, 17, 18].map((age) => (
+                                        <option key={age} value={age}>{age} Years</option>
+                                    ))}
+                                </optgroup>
                             </select>
                             <ChevronRight className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-gray-500" />
                         </div>
@@ -165,7 +178,8 @@ export function ApplicationForm() {
 
                 {/* Image Upload */}
                 <div className="space-y-1">
-                    <label className="ml-1 text-sm font-bold text-gray-700">Child's Photo</label>
+                    <label className="ml-1 text-sm font-bold text-gray-700">Photos (Headshot + Full Length)</label>
+                    <p className="ml-1 text-xs text-gray-500 mb-1">Showcase personality! Natural light prefered.</p>
                     <ImageUpload
                         value={imageValue}
                         onChange={(file) => setValue('image', file as any, { shouldValidate: true })}

@@ -5,7 +5,8 @@ import { MobileFab } from '@/components/MobileFab'
 import { InfinitePortfolio } from '@/components/InfinitePortfolio'
 import { StarQualityChecklist } from '@/components/StarQualityChecklist'
 import { EthicalModelling } from '@/components/EthicalModelling'
-import { Star, Instagram, Facebook, Twitter, Heart, CheckCircle2 } from 'lucide-react'
+import { AgeDivisions } from '@/components/AgeDivisions'
+import { Star, Instagram, Facebook, Twitter, Heart, CheckCircle2, GraduationCap } from 'lucide-react'
 import Image from 'next/image'
 
 export default function Home() {
@@ -28,8 +29,8 @@ export default function Home() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/hero-child.png"
-            alt="Happy diverse child model"
+            src="/hero-teen-lifestyle.png"
+            alt="Diverse group of cool kids and teens"
             fill
             className="object-cover object-center"
             priority
@@ -51,22 +52,28 @@ export default function Home() {
             {/* Wiggling Status Pill */}
             <div className="inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-4 py-2 text-sm font-bold text-gray-900 shadow-xl ring-2 ring-brand-pink/50 animate-wiggle origin-left">
               <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-              Accepting Applications for 2026
+              Accepting Applications for Ages 5-16
             </div>
 
             <h1 className="text-5xl font-black tracking-tight text-white drop-shadow-lg sm:text-6xl lg:text-7xl leading-[1.1]">
-              Turn Your Child's <br />
-              <span className="text-brand-yellow drop-shadow-md">Smile</span> Into Stardom.
+              Empowering the <br />
+              <span className="text-brand-yellow drop-shadow-md">Next Generation</span> of Talent.
             </h1>
 
             <p className="text-lg font-medium text-white/90 drop-shadow-md lg:text-xl md:max-w-md">
-              We connect cuteness with confidence. The UK's most trusted agency.
+              We bridge the gap between young potential and professional opportunity. The UK's most trusted agency.
             </p>
 
             {/* No Upfront Fees Badge */}
-            <div className="inline-flex items-center gap-2 bg-brand-yellow text-gray-900 font-black px-4 py-2 rounded-lg -rotate-2 shadow-lg border-2 border-white">
-              <CheckCircle2 className="w-5 h-5" />
-              NO JOINING FEES!
+            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+              <div className="inline-flex items-center gap-2 bg-brand-yellow text-gray-900 font-black px-4 py-2 rounded-lg -rotate-2 shadow-lg border-2 border-white">
+                <CheckCircle2 className="w-5 h-5" />
+                NO JOINING FEES!
+              </div>
+              <div className="inline-flex items-center gap-2 bg-white text-brand-blue font-black px-4 py-2 rounded-lg rotate-1 shadow-lg border-2 border-brand-blue">
+                <GraduationCap className="w-5 h-5" />
+                SCHOOL FIRST POLICY
+              </div>
             </div>
           </div>
 
@@ -77,6 +84,17 @@ export default function Home() {
 
         </div>
       </section>
+
+      {/* Hero Footnote / Trust Signal */}
+      <div className="bg-white border-b border-gray-100 py-4">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-2 text-sm font-bold text-gray-500">
+          <GraduationCap className="w-4 h-4 text-brand-blue" />
+          <span>We coordinate fully with Local Authorities & Schools for licensing.</span>
+        </div>
+      </div>
+
+      {/* Age Divisions Section */}
+      <AgeDivisions />
 
       {/* Star Quality Checklist */}
       <StarQualityChecklist />
