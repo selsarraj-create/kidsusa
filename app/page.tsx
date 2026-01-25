@@ -92,14 +92,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Hero Footnote / Trust Signal */}
-      <div className="bg-white border-b border-gray-100 py-4">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-2 text-sm font-bold text-gray-500">
-          <GraduationCap className="w-4 h-4 text-brand-blue" />
-          <span>We coordinate fully with Local Authorities & Schools for licensing.</span>
-        </div>
-      </div>
-
       {/* Age Divisions Section */}
       <AgeDivisions />
 
