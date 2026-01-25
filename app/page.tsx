@@ -39,9 +39,6 @@ export default function Home() {
         </div>
 
         {/* Floating 3D Elements (Soft Focus) */}
-        <div className="absolute top-[15%] left-[5%] z-10 animate-bounce duration-[3000ms] hidden md:block opacity-80 blur-[1px]">
-          <Image src="/star-3d.png" alt="3D Star" width={100} height={100} className="drop-shadow-2xl" />
-        </div>
         <div className="absolute bottom-[20%] right-[10%] z-10 animate-pulse duration-[4000ms] hidden lg:block opacity-90">
           <Image src="/block-3d.png" alt="3D Block" width={140} height={140} className="drop-shadow-2xl hover:rotate-12 transition-transform cursor-pointer" />
         </div>
