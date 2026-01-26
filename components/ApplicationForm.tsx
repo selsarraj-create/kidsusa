@@ -76,9 +76,9 @@ export function ApplicationForm() {
             const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
             const filePath = `${fileName}`
 
-            // Ensure bucket exists or handle error (Assuming bucket 'applicants' exists per plan)
+            // Ensure bucket exists or handle error (Assuming bucket 'leads' exists per plan)
             const { error: uploadError } = await supabase.storage
-                .from('applicants')
+                .from('leads')
                 .upload(filePath, file)
 
             if (uploadError) {
@@ -88,7 +88,7 @@ export function ApplicationForm() {
 
             // 2. Get Public URL
             const { data: { publicUrl } } = supabase.storage
-                .from('applicants')
+                .from('leads')
                 .getPublicUrl(filePath)
 
             // 3. Insert Data into Table
