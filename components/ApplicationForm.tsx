@@ -109,6 +109,16 @@ export function ApplicationForm() {
                 throw new Error("Failed to save application")
             }
 
+            // Track Conversion in GTM
+            if (typeof window !== 'undefined') {
+                (window as any).dataLayer = (window as any).dataLayer || [];
+                (window as any).dataLayer.push({
+                    'event': 'form_submission',
+                    'form_name': 'application_form',
+                    'status': 'success'
+                });
+            }
+
             alert("Application Received! We will be in touch.")
 
         } catch (error) {
