@@ -21,6 +21,8 @@ begin
   alter table public.applications add column if not exists gender text null;
   alter table public.applications add column if not exists city text null;
   alter table public.applications add column if not exists image_url text null;
+  alter table public.applications add column if not exists crm_status text default 'pending';
+  alter table public.applications add column if not exists crm_response text null;
 end;
 $$;
 
@@ -36,6 +38,14 @@ create policy "Allow public inserts"
   for insert
   to anon, authenticated
   with check (true);
+
+-- Create policy to allow reading (Required for Dashboard)
+create policy "Allow public reading"
+  on public.applications
+  for select
+  to anon, authenticated
+  using (true);
+
 
 -- STORAGE SETUP
 

@@ -18,13 +18,39 @@ type Application = {
     post_code: string
     image_url: string
     status: string
+    crm_status?: string
+    crm_response?: string
 }
 
 export default function Dashboard() {
     const [leads, setLeads] = useState<Application[]>([])
     const [loading, setLoading] = useState(true)
+    const [retrying, setRetrying] = useState<string | null>(null)
     const [dateFrom, setDateFrom] = useState('')
     const [dateTo, setDateTo] = useState('')
+
+    const handleRetry = async (leadId: string) => {
+        setRetrying(leadId)
+        try {
+            const res = await fetch('/api/leads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ applicationId: leadId })
+            })
+
+            if (res.ok) {
+                // Refresh data to show success
+                await fetchLeads()
+                alert("Retry successful!")
+            } else {
+                alert("Retry failed. Check console.")
+            }
+        } catch (e) {
+            console.error(e)
+            alert("Error retrying")
+        }
+        setRetrying(null)
+    }
 
     const fetchLeads = async () => {
         setLoading(true)
@@ -106,6 +132,7 @@ export default function Dashboard() {
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Age</th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Contact</th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Submitted</th>
+                                    <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">CRM Status</th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Image</th>
                                 </tr>
                             </thead>
@@ -140,6 +167,33 @@ export default function Dashboard() {
                                                 </div>
                                                 <div className="text-xs text-gray-400">
                                                     {format(new Date(lead.created_at), 'HH:mm')}
+                                                </div>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${lead.crm_status === 'success'
+                                                            ? 'bg-green-100 text-green-700'
+                                                            : 'bg-red-100 text-red-700'
+                                                        }`}>
+                                                        {lead.crm_status === 'success' ? (
+                                                            <CheckCircle className="w-3 h-3 mr-1" />
+                                                        ) : (
+                                                            <XCircle className="w-3 h-3 mr-1" />
+                                                        )}
+                                                        {lead.crm_status?.toUpperCase() || 'PENDING'}
+                                                    </span>
+
+                                                    {lead.crm_status !== 'success' && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-6 text-xs"
+                                                            disabled={retrying === lead.id}
+                                                            onClick={() => handleRetry(lead.id)}
+                                                        >
+                                                            {retrying === lead.id ? '...' : 'Retry'}
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="p-4">

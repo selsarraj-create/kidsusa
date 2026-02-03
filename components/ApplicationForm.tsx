@@ -172,9 +172,11 @@ export function ApplicationForm() {
                 .getPublicUrl(filePath)
 
             // 3. Insert Data into Table
+            const applicationId = crypto.randomUUID()
             const { error: dbError } = await supabase
                 .from('applications')
                 .insert({
+                    id: applicationId,
                     child_name: data.childName,
                     first_name: data.firstName,
                     last_name: data.lastName,
@@ -210,6 +212,7 @@ export function ApplicationForm() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        applicationId, // Send ID for tracking
                         campaignCode: data.campaignCode,
                         email: data.email,
                         phone: data.phone,
