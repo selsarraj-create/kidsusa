@@ -65,7 +65,7 @@ export default function Home() {
               </h1>
 
               <p className="text-lg font-medium text-white/90 drop-shadow-md lg:text-xl md:max-w-md">
-                We bridge the gap between young potential and professional opportunity. London's Leading Model Support Service.
+                We bridge the gap between young potential and professional opportunity. USA's Leading Model Support Service.
               </p>
 
             </div>
@@ -165,8 +165,7 @@ export default function Home() {
             </p>
             {/* New Trust Info */}
             <div className="flex flex-col gap-1 text-xs text-gray-400 font-medium text-center md:text-left">
-              <p>📍 123 High Street, Kensington, London, W8 5SA</p>
-              <p>📧 support@tinytalent.co.uk</p>
+
             </div>
           </div>
 
@@ -183,7 +182,7 @@ export default function Home() {
               </a>
             </div>
             <p className="text-xs text-gray-400 flex items-center gap-1">
-              Made with <Heart className="h-3 w-3 text-red-400 fill-current" /> in London. © 2026
+              Made with <Heart className="h-3 w-3 text-red-400 fill-current" /> in USA. © 2026
             </p>
           </div>
 
