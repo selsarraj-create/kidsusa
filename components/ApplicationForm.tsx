@@ -18,7 +18,7 @@ const formSchema = z.object({
     firstName: z.string().min(2, "First name is too short"),
     lastName: z.string().min(2, "Last name is too short"),
     email: z.string().email("Please enter a valid email address"),
-    gender: z.enum(["M", "F"], { required_error: "Please select a gender" }),
+    gender: z.enum(["M", "F"], { message: "Please select a gender" }),
     city: z.string().optional(),
     campaignCode: z.string().optional(),
     age: z.string().regex(/^\d+$/, "Age must be a number"),
