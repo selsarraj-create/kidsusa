@@ -1,11 +1,13 @@
 "use client"
 
 import React, { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import { toast } from 'sonner'
 import { Lock, ShieldCheck, ChevronRight, User, MapPin, Phone, Calendar } from 'lucide-react'
 import { motion } from 'framer-motion'
+
 
 import { Input } from './ui/input'
 import { Button } from './ui/button'
@@ -202,12 +204,21 @@ export function ApplicationForm() {
                 });
             }
 
-            alert("Application Received! We will be in touch.")
+            toast.success("Application Received!", {
+                description: "We will be in touch shortly."
+            })
 
         } catch (error) {
             console.error("Submission failed:", error)
-            alert("Something went wrong. Please try again.")
+            toast.error("Something went wrong. Please try again.")
         }
+    }
+
+    const onError = (errors: FieldErrors<FormValues>) => {
+        console.log("Form errors:", errors)
+        toast.error("Please check the form for missing fields", {
+            description: "Required fields are highlighted in red."
+        })
     }
 
     const imageValue = watch('image')
@@ -228,7 +239,7 @@ export function ApplicationForm() {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4">
 
                 {/* Child's Name & Gender */}
                 <div className="grid grid-cols-2 gap-3">
