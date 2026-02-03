@@ -4,7 +4,7 @@ import { ScrollToTop } from '@/components/ScrollToTop'
 import { MobileFab } from '@/components/MobileFab'
 import { InfinitePortfolio } from '@/components/InfinitePortfolio'
 import { StarQualityChecklist } from '@/components/StarQualityChecklist'
-import { EthicalModelling } from '@/components/EthicalModelling'
+import { EthicalModeling } from '@/components/EthicalModeling'
 import { AgeDivisions } from '@/components/AgeDivisions'
 import { Star, Instagram, Facebook, Twitter, Heart, CheckCircle2, GraduationCap } from 'lucide-react'
 import Image from 'next/image'
@@ -97,8 +97,8 @@ export default function Home() {
       {/* Star Quality Checklist */}
       <StarQualityChecklist />
 
-      {/* Ethical Modelling Section */}
-      <EthicalModelling />
+      {/* Ethical Modeling Section */}
+      <EthicalModeling />
 
       {/* Success Stories (Fade In on Scroll handled by native CSS or simple keyframes if needed, sticking to static for speed unless framer requested) */}
       <section className="relative z-10 mx-auto max-w-7xl px-4 py-20 bg-[#F7F5F2]">

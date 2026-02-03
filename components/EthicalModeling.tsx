@@ -3,7 +3,7 @@
 import React from 'react'
 import { ShieldCheck, HeartHandshake, Zap } from 'lucide-react'
 
-export function EthicalModelling() {
+export function EthicalModeling() {
     return (
         <section className="mx-auto max-w-7xl px-4 py-16 space-y-20">
 
@@ -23,7 +23,7 @@ export function EthicalModelling() {
                             <span className="text-brand-pink">We Look for Personality.</span>
                         </h2>
                         <p className="text-lg text-gray-600 leading-relaxed">
-                            The modelling world has changed. Brands want real children who enjoy themselves!
+                            The modeling world has changed. Brands want real children who enjoy themselves!
                             There are no specific rules for height, hair color, or look. If your child has energy
                             and a smile that lights up the room, that's everything we need.
                         </p>
@@ -51,7 +51,7 @@ export function EthicalModelling() {
                     </div>
                     <div>
                         <h3 className="text-2xl font-black text-gray-900">Safe & Professional</h3>
-                        <p className="text-gray-600 font-medium">Modelling should always be fun. We prioritize your child's happiness above all.</p>
+                        <p className="text-gray-600 font-medium">Modeling should always be fun. We prioritize your child's happiness above all.</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 bg-white px-6 py-3 rounded-xl shadow-sm border border-gray-200">
