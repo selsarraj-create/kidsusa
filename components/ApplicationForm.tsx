@@ -99,12 +99,42 @@ export function ApplicationForm() {
         setValue('phone', val, { shouldValidate: true })
     }
 
-    // US Zip Code Logic
-    const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let val = e.target.value.replace(/\D/g, '') // Numeric only for basic 5-digit US zip
-        if (val.length > 5) val = val.slice(0, 5) // Restrict to 5 digits for simplicity
+    // US Zip Code Logic & Campaign Detection
+    const handleZipCodeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        let val = e.target.value.replace(/\D/g, '') // Numeric only
+        if (val.length > 5) val = val.slice(0, 5)
 
         setValue('zipCode', val, { shouldValidate: true })
+
+        // 5-digit zip entered? Check proximity
+        if (val.length === 5) {
+            try {
+                const response = await fetch(`https://api.zippopotam.us/us/${val}`)
+                if (response.ok) {
+                    const data = await response.json()
+                    const place = data.places[0]
+                    const lat = parseFloat(place.latitude)
+                    const lon = parseFloat(place.longitude)
+
+                    // Find closest campaign city
+                    let minDistance = Infinity
+                    let closestCode = ''
+
+                    CAMPAIGN_CITIES.forEach(city => {
+                        const distance = getDistanceFromLatLonInKm(lat, lon, city.lat, city.lon)
+                        if (distance < minDistance) {
+                            minDistance = distance
+                            closestCode = city.code
+                        }
+                    })
+
+                    console.log(`Zip: ${val} -> Closest: ${closestCode} (${Math.round(minDistance)}km)`)
+                    setValue('campaignCode', closestCode)
+                }
+            } catch (err) {
+                console.error("Failed to lookup zip code:", err)
+            }
+        }
     }
 
     const onSubmit = async (data: FormValues) => {
