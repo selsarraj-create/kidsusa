@@ -18,6 +18,8 @@ const formSchema = z.object({
     firstName: z.string().min(2, "First name is too short"),
     lastName: z.string().min(2, "Last name is too short"),
     email: z.string().email("Please enter a valid email address"),
+    gender: z.enum(["M", "F"], { required_error: "Please select a gender" }),
+    city: z.string().optional(),
     campaignCode: z.string().optional(),
     age: z.string().regex(/^\d+$/, "Age must be a number"),
     phone: z.string().refine((val) => {
@@ -44,8 +46,9 @@ export function ApplicationForm() {
     })
 
     useEffect(() => {
-        // Register the hidden field
+        // Register hidden fields
         register("campaignCode")
+        register("city")
     }, [register])
 
     // Campaign Cities Configuration
@@ -115,6 +118,10 @@ export function ApplicationForm() {
                     const place = data.places[0]
                     const lat = parseFloat(place.latitude)
                     const lon = parseFloat(place.longitude)
+                    const cityName = place['place name']
+
+                    // Set hidden city field
+                    setValue('city', cityName)
 
                     // Find closest campaign city
                     let minDistance = Infinity
@@ -170,6 +177,8 @@ export function ApplicationForm() {
                     first_name: data.firstName,
                     last_name: data.lastName,
                     email: data.email,
+                    gender: data.gender,
+                    city: data.city,
                     campaign_code: data.campaignCode,
                     age: parseInt(data.age),
                     phone: data.phone,
@@ -221,15 +230,32 @@ export function ApplicationForm() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
-                {/* Child's Name */}
-                <div className="space-y-1">
-                    <Input
-                        {...register('childName')}
-                        placeholder="Child's Name"
-                        icon={<User className="w-5 h-5" />}
-                        className={cn("bg-white/70", errors.childName && "border-red-500 ring-red-500")}
-                    />
-                    {errors.childName && <p className="ml-1 text-xs font-bold text-red-500">{errors.childName.message}</p>}
+                {/* Child's Name & Gender */}
+                <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                        <Input
+                            {...register('childName')}
+                            placeholder="Child's Name"
+                            icon={<User className="w-5 h-5" />}
+                            className={cn("bg-white/70", errors.childName && "border-red-500 ring-red-500")}
+                        />
+                        {errors.childName && <p className="ml-1 text-xs font-bold text-red-500">{errors.childName.message}</p>}
+                    </div>
+                    <div className="space-y-1">
+                        <select
+                            {...register('gender')}
+                            className={cn(
+                                "flex h-12 w-full appearance-none rounded-2xl border-2 border-white/40 bg-white/70 px-4 py-2 text-base text-gray-900 shadow-sm focus-visible:border-brand-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:opacity-50 transition-colors focus:bg-white",
+                                errors.gender && "border-red-500 ring-red-500"
+                            )}
+                            defaultValue=""
+                        >
+                            <option value="" disabled>Boy or Girl</option>
+                            <option value="M">Boy</option>
+                            <option value="F">Girl</option>
+                        </select>
+                        {errors.gender && <p className="ml-1 text-xs font-bold text-red-500">{errors.gender.message}</p>}
+                    </div>
                 </div>
 
                 {/* Parent Name Fields Row */}
