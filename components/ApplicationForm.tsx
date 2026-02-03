@@ -18,7 +18,7 @@ const formSchema = z.object({
     lastName: z.string().min(2, "Last name is too short"),
     age: z.string().regex(/^\d+$/, "Age must be a number"),
     phone: z.string().min(10, "Please enter a valid phone number"),
-    postCode: z.string().min(5, "Please enter a valid Post Code"),
+    zipCode: z.string().min(5, "Please enter a valid Zip Code").max(10, "Zip Code too long"),
     image: z.custom<File>((v) => v instanceof File, {
         message: "Please upload a photo of your child",
     }),
@@ -37,33 +37,29 @@ export function ApplicationForm() {
         resolver: zodResolver(formSchema),
     })
 
-    // Basic Input Masking Logic
+    // Basic Input Masking Logic (US Phone)
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val = e.target.value.replace(/\D/g, '')
-        if (val.length > 11) val = val.slice(0, 11)
-        // Format as 07XXX XXXXXX (UK style basic) or just generic spacing
-        if (val.length > 5) {
-            val = val.slice(0, 5) + ' ' + val.slice(5)
+        if (val.length > 10) val = val.slice(0, 10)
+
+        // Format as (XXX) XXX-XXXX
+        if (val.length > 6) {
+            val = `(${val.slice(0, 3)}) ${val.slice(3, 6)}-${val.slice(6)}`
+        } else if (val.length > 3) {
+            val = `(${val.slice(0, 3)}) ${val.slice(3)}`
+        } else if (val.length > 0) {
+            val = `(${val}`
         }
+
         setValue('phone', val, { shouldValidate: true })
     }
 
-    const handlePostCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '')
-        // Simple UK formatting (adding space before last 3 chars if length > 4)
-        if (val.length > 4) { // e.g. SW1A1AA -> SW1A 1AA
-            // This is a naive formatter, but valid for requirement "spacing as user types"
-            // A robust one would need more logic, let's keep it simple: max 7 chars strict
-            if (val.length > 7) val = val.slice(0, 7)
-            const last3 = val.slice(-3)
-            const prefix = val.slice(0, -3)
-            if (val.length >= 5) {
-                val = `${prefix} ${last3}`
-            }
-        }
+    // US Zip Code Logic
+    const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let val = e.target.value.replace(/\D/g, '') // Numeric only for basic 5-digit US zip
+        if (val.length > 5) val = val.slice(0, 5) // Restrict to 5 digits for simplicity
 
-        // Better simple approach for now: just uppercase
-        setValue('postCode', val, { shouldValidate: true })
+        setValue('zipCode', val, { shouldValidate: true })
     }
 
     const onSubmit = async (data: FormValues) => {
@@ -99,7 +95,7 @@ export function ApplicationForm() {
                     last_name: data.lastName,
                     age: parseInt(data.age),
                     phone: data.phone,
-                    post_code: data.postCode,
+                    post_code: data.zipCode, // Mapping zipCode to existing post_code column for now
                     image_url: publicUrl,
                     status: 'new'
                 })
@@ -169,7 +165,7 @@ export function ApplicationForm() {
                     </div>
                 </div>
 
-                {/* Age & PostCode Row */}
+                {/* Age & Zip Code Row */}
                 <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
                         <div className="relative">
@@ -208,13 +204,13 @@ export function ApplicationForm() {
 
                     <div className="space-y-1">
                         <Input
-                            {...register('postCode')}
-                            onChange={handlePostCodeChange}
-                            placeholder="Post Code"
+                            {...register('zipCode')}
+                            onChange={handleZipCodeChange}
+                            placeholder="Zip Code"
                             icon={<MapPin className="w-5 h-5" />}
-                            className={cn("bg-white/70 uppercase", errors.postCode && "border-red-500 ring-red-500")}
+                            className={cn("bg-white/70", errors.zipCode && "border-red-500 ring-red-500")}
                         />
-                        {errors.postCode && <p className="ml-1 text-xs font-bold text-red-500">{errors.postCode.message}</p>}
+                        {errors.zipCode && <p className="ml-1 text-xs font-bold text-red-500">{errors.zipCode.message}</p>}
                     </div>
                 </div>
 
@@ -224,7 +220,7 @@ export function ApplicationForm() {
                         {...register('phone')}
                         type="tel"
                         onChange={handlePhoneChange}
-                        placeholder="Phone Number (07...)"
+                        placeholder="Phone Number (555) 555-5555"
                         icon={<Phone className="w-5 h-5" />}
                         className={cn("bg-white/70", errors.phone && "border-red-500 ring-red-500")}
                     />
@@ -234,7 +230,7 @@ export function ApplicationForm() {
                 {/* Image Upload */}
                 <div className="space-y-1">
                     <label className="ml-1 text-sm font-bold text-gray-700">Photos (Headshot + Full Length)</label>
-                    <p className="ml-1 text-xs text-gray-500 mb-1">Showcase personality! Natural light prefered.</p>
+                    <p className="ml-1 text-xs text-gray-500 mb-1">Showcase personality! Natural light preferred.</p>
                     <ImageUpload
                         value={imageValue}
                         onChange={(file) => setValue('image', file as any, { shouldValidate: true })}
