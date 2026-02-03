@@ -250,7 +250,7 @@ export function ApplicationForm() {
                             )}
                             defaultValue=""
                         >
-                            <option value="" disabled>Boy or Girl</option>
+                            <option value="" disabled>Gender</option>
                             <option value="M">Boy</option>
                             <option value="F">Girl</option>
                         </select>
