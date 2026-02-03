@@ -187,10 +187,10 @@ export function ApplicationForm() {
                                     errors.age && "border-red-500 ring-red-500"
                                 )}
                                 {...register('age')}
-                                defaultValue="7" // Default to typical starting age
+                                defaultValue="3" // Start default at 3 per user request
                             >
                                 <option value="" disabled>Age</option>
-                                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((age) => (
+                                {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((age) => (
                                     <option key={age} value={age}>{age} Years</option>
                                 ))}
                             </select>
