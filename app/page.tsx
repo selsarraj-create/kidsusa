@@ -161,7 +161,7 @@ export default function Home() {
               <span className="text-xl font-black text-gray-900 tracking-tight">TinyTalent<span className="text-brand-pink">.</span></span>
             </div>
             <p className="text-sm text-gray-500 font-medium max-w-xs text-center md:text-left">
-              Connecting cuteness with confidence since 2010. The UK's favorite child modelling family.
+              Connecting cuteness with confidence since 2010. The USA's favorite child modeling family.
             </p>
             {/* New Trust Info */}
             <div className="flex flex-col gap-1 text-xs text-gray-400 font-medium text-center md:text-left">

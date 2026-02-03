@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "TinyTalent | Future Stars",
-  description: "Join the UK's most vibrant child modeling platform. Application takes less than 2 minutes!",
+  description: "Join the USA's most vibrant child modeling platform. Application takes less than 2 minutes!",
 };
 
 import Script from "next/script";
