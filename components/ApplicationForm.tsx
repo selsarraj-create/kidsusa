@@ -321,7 +321,7 @@ export function ApplicationForm() {
                             >
                                 <option value="" disabled>Age</option>
                                 {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((age) => (
-                                    <option key={age} value={age}>{age} Years</option>
+                                    <option key={age} value={age}>{age}</option>
                                 ))}
                             </select>
                             <ChevronRight className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-gray-500" />
