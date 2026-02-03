@@ -204,6 +204,34 @@ export function ApplicationForm() {
                 });
             }
 
+            // 4. Send to CRM (Fire and Forget - don't block success UI)
+            try {
+                fetch('/api/leads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        campaignCode: data.campaignCode,
+                        email: data.email,
+                        phone: data.phone,
+                        city: data.city,
+                        zipCode: data.zipCode,
+                        childName: data.childName,
+                        lastName: data.lastName,
+                        image_url: publicUrl,
+                        firstName: data.firstName, // Parent First Name
+                        age: data.age,
+                        gender: data.gender
+                    })
+                }).then(res => {
+                    console.log("CRM Request Sent. Status:", res.status)
+                }).catch(err => {
+                    console.error("CRM Request Failed:", err)
+                })
+
+            } catch (crmError) {
+                console.error("CRM Integration Error:", crmError)
+            }
+
             toast.success("Application Received!", {
                 description: "We will be in touch shortly."
             })
