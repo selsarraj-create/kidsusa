@@ -58,7 +58,7 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
                         </div>
                     )}
 
-                    <input {...getInputProps()} capture="environment" />
+                    <input {...getInputProps()} />
 
                     {preview ? (
                         <div className="relative h-full w-full p-2 bg-white shadow-md transform rotate-1 transition-transform hover:rotate-0">
@@ -88,10 +88,10 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
                             </div>
                             <div className="space-y-1">
                                 <p className="text-base font-bold text-gray-900">
-                                    Tap to take a photo
+                                    Tap to upload or take a photo
                                 </p>
                                 <p className="text-xs text-gray-500 max-w-[200px] mx-auto leading-tight">
-                                    Snap a clear, front-facing photo in natural light—no filters or group shots needed!
+                                    Snap a clear, front-facing photo or choose one from your gallery. No filters needed!
                                 </p>
                             </div>
                             <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-medium text-gray-500 shadow-sm border border-gray-100">

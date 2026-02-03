@@ -238,7 +238,7 @@ export function ApplicationForm() {
 
                 {/* Image Upload */}
                 <div className="space-y-1">
-                    <label className="ml-1 text-sm font-bold text-gray-700">Photos (Headshot + Full Length)</label>
+                    <label className="ml-1 text-sm font-bold text-gray-700">Photo Upload</label>
                     <p className="ml-1 text-xs text-gray-500 mb-1">Showcase personality! Natural light preferred.</p>
                     <ImageUpload
                         value={imageValue}
