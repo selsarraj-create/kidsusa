@@ -14,8 +14,10 @@ import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 
 const formSchema = z.object({
+    childName: z.string().min(2, "Child's name is too short"),
     firstName: z.string().min(2, "First name is too short"),
     lastName: z.string().min(2, "Last name is too short"),
+    email: z.string().email("Please enter a valid email address"),
     age: z.string().regex(/^\d+$/, "Age must be a number"),
     phone: z.string().refine((val) => {
         const digits = val.replace(/\D/g, '')
@@ -100,8 +102,10 @@ export function ApplicationForm() {
             const { error: dbError } = await supabase
                 .from('applications')
                 .insert({
+                    child_name: data.childName,
                     first_name: data.firstName,
                     last_name: data.lastName,
+                    email: data.email,
                     age: parseInt(data.age),
                     phone: data.phone,
                     post_code: data.zipCode, // Mapping zipCode to existing post_code column for now
@@ -152,12 +156,24 @@ export function ApplicationForm() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
-                {/* Name Fields Row */}
-                <div className="grid grid-cols-2 gap-3">
+                {/* Child's Name */}
+                <div className="space-y-1">
+                    <Input
+                        {...register('childName')}
+                        placeholder="Child's Name"
+                        icon={<User className="w-5 h-5" />}
+                        className={cn("bg-white/70", errors.childName && "border-red-500 ring-red-500")}
+                    />
+                    {errors.childName && <p className="ml-1 text-xs font-bold text-red-500">{errors.childName.message}</p>}
+                </div>
+
+                {/* Parent Name Fields Row */}
+                <label className="text-sm font-bold text-gray-700 ml-1">Parent's Details</label>
+                <div className="grid grid-cols-2 gap-3 mt-0!">
                     <div className="space-y-1">
                         <Input
                             {...register('firstName')}
-                            placeholder="First Name"
+                            placeholder="Parent First Name"
                             icon={<User className="w-5 h-5" />}
                             className={cn("bg-white/70", errors.firstName && "border-red-500 ring-red-500")}
                         />
@@ -166,12 +182,24 @@ export function ApplicationForm() {
                     <div className="space-y-1">
                         <Input
                             {...register('lastName')}
-                            placeholder="Last Name"
+                            placeholder="Parent Last Name"
                             icon={<User className="w-5 h-5" />}
                             className={cn("bg-white/70", errors.lastName && "border-red-500 ring-red-500")}
                         />
                         {errors.lastName && <p className="ml-1 text-xs font-bold text-red-500">{errors.lastName.message}</p>}
                     </div>
+                </div>
+
+                {/* Email Field */}
+                <div className="space-y-1">
+                    <Input
+                        {...register('email')}
+                        type="email"
+                        placeholder="Email Address"
+                        icon={<span className="font-bold text-gray-400">@</span>}
+                        className={cn("bg-white/70", errors.email && "border-red-500 ring-red-500")}
+                    />
+                    {errors.email && <p className="ml-1 text-xs font-bold text-red-500">{errors.email.message}</p>}
                 </div>
 
                 {/* Age & Zip Code Row */}
