@@ -17,7 +17,10 @@ const formSchema = z.object({
     firstName: z.string().min(2, "First name is too short"),
     lastName: z.string().min(2, "Last name is too short"),
     age: z.string().regex(/^\d+$/, "Age must be a number"),
-    phone: z.string().min(10, "Please enter a valid phone number"),
+    phone: z.string().refine((val) => {
+        const digits = val.replace(/\D/g, '')
+        return digits.length === 10 && !digits.startsWith('1')
+    }, "Please enter a valid 10-digit number (cannot start with 1)"),
     zipCode: z.string().min(5, "Please enter a valid Zip Code").max(10, "Zip Code too long"),
     image: z.custom<File>((v) => v instanceof File, {
         message: "Please upload a photo of your child",
@@ -40,6 +43,12 @@ export function ApplicationForm() {
     // Basic Input Masking Logic (US Phone)
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val = e.target.value.replace(/\D/g, '')
+
+        // Prevent starting with 1
+        if (val.startsWith('1')) {
+            val = val.substring(1)
+        }
+
         if (val.length > 10) val = val.slice(0, 10)
 
         // Format as (XXX) XXX-XXXX
