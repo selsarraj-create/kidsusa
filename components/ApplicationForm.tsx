@@ -190,21 +190,9 @@ export function ApplicationForm() {
                                 defaultValue="7" // Default to typical starting age
                             >
                                 <option value="" disabled>Age</option>
-                                <optgroup label="Primary (5-10)">
-                                    {[5, 6, 7, 8, 9, 10].map((age) => (
-                                        <option key={age} value={age}>{age} Years</option>
-                                    ))}
-                                </optgroup>
-                                <optgroup label="Secondary (11-17)">
-                                    {[11, 12, 13, 14, 15, 16, 17].map((age) => (
-                                        <option key={age} value={age}>{age} Years</option>
-                                    ))}
-                                </optgroup>
-                                <optgroup label="Other">
-                                    {[0, 1, 2, 3, 4, 18].map((age) => (
-                                        <option key={age} value={age}>{age} Years</option>
-                                    ))}
-                                </optgroup>
+                                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((age) => (
+                                    <option key={age} value={age}>{age} Years</option>
+                                ))}
                             </select>
                             <ChevronRight className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-gray-500" />
                         </div>
