@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -18,6 +18,7 @@ const formSchema = z.object({
     firstName: z.string().min(2, "First name is too short"),
     lastName: z.string().min(2, "Last name is too short"),
     email: z.string().email("Please enter a valid email address"),
+    campaignCode: z.string().optional(),
     age: z.string().regex(/^\d+$/, "Age must be a number"),
     phone: z.string().refine((val) => {
         const digits = val.replace(/\D/g, '')
@@ -41,6 +42,39 @@ export function ApplicationForm() {
     } = useForm<FormValues>({
         resolver: zodResolver(formSchema),
     })
+
+    useEffect(() => {
+        // Register the hidden field
+        register("campaignCode")
+    }, [register])
+
+    // Campaign Cities Configuration
+    const CAMPAIGN_CITIES = [
+        { code: '#NYKIDS', name: 'New York', lat: 40.7128, lon: -74.0060 },
+        { code: '#BOSKIDS', name: 'Boston', lat: 42.3601, lon: -71.0589 },
+        { code: '#FLKIDS', name: 'Miami', lat: 25.7617, lon: -80.1918 },
+        { code: '#NAKIDS', name: 'Nashville', lat: 36.1627, lon: -86.7816 },
+        { code: '#CHIKIDS', name: 'Chicago', lat: 41.8781, lon: -87.6298 },
+        { code: '#HOUKIDS', name: 'Houston', lat: 29.7604, lon: -95.3698 },
+        { code: '#DALKIDS', name: 'Dallas', lat: 32.7767, lon: -96.7970 },
+    ]
+
+    // Haversine Distance Calculation (km)
+    const getDistanceFromLatLonInKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+        const R = 6371; // Radius of the earth in km
+        const dLat = deg2rad(lat2 - lat1);
+        const dLon = deg2rad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat1)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    const deg2rad = (deg: number) => {
+        return deg * (Math.PI / 180)
+    }
 
     // Basic Input Masking Logic (US Phone)
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,6 +140,7 @@ export function ApplicationForm() {
                     first_name: data.firstName,
                     last_name: data.lastName,
                     email: data.email,
+                    campaign_code: data.campaignCode,
                     age: parseInt(data.age),
                     phone: data.phone,
                     post_code: data.zipCode, // Mapping zipCode to existing post_code column for now
