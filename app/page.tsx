@@ -6,7 +6,7 @@ import { InfinitePortfolio } from '@/components/InfinitePortfolio'
 import { StarQualityChecklist } from '@/components/StarQualityChecklist'
 import { EthicalModeling } from '@/components/EthicalModeling'
 import { AgeDivisions } from '@/components/AgeDivisions'
-import { Star, Instagram, Facebook, Twitter, Heart, CheckCircle2, GraduationCap } from 'lucide-react'
+import { Star, Facebook, Twitter, Heart, CheckCircle2, GraduationCap } from 'lucide-react'
 import Image from 'next/image'
 
 export default function Home() {
@@ -177,9 +177,7 @@ export default function Home() {
 
           <div className="flex flex-col items-center md:items-end gap-4">
             <div className="flex gap-4">
-              <a href="https://www.instagram.com/edgetalent.uk/" target="_blank" rel="noopener noreferrer" className="h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-brand-pink hover:text-white transition-all">
-                <Instagram className="h-5 w-5" />
-              </a>
+
             </div>
             <p className="text-xs text-gray-400 flex items-center gap-1">
               Made with <Heart className="h-3 w-3 text-red-400 fill-current" /> in USA. © 2026
