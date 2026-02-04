@@ -2,7 +2,14 @@
 
 import { usePathname } from "next/navigation"
 import Script from "next/script"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
+
+// Extend Window interface to include fbq
+declare global {
+    interface Window {
+        fbq: any;
+    }
+}
 
 export const FB_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "1437635621416194"
 
