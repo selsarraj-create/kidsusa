@@ -126,13 +126,20 @@ export async function POST(request: Request) {
                 <p><small>CRM Status: ${crmStatus}</small></p>
             `;
 
-            await transporter.sendMail({
-                from: process.env.SMTP_FROM || '"USA Kids" <notifications@usakids.com>',
-                to: process.env.SMTP_TO,
-                subject: subject,
-                html: htmlContent,
-            });
-            console.log(`Email sent: ${subject}`);
+            const toAddress = process.env.SMTP_TO || process.env.LEAD_NOTIFICATION_EMAIL;
+
+            if (!toAddress) {
+                console.error("No email recipient (SMTP_TO or LEAD_NOTIFICATION_EMAIL) configured");
+                // Don't throw, just log and continue so we don't break the client response
+            } else {
+                await transporter.sendMail({
+                    from: process.env.SMTP_FROM || '"USA Kids" <notifications@usakids.com>',
+                    to: toAddress,
+                    subject: subject,
+                    html: htmlContent,
+                });
+                console.log(`Email sent to ${toAddress}: ${subject}`);
+            }
         } catch (emailError) {
             console.error("Failed to send email:", emailError);
             // Don't fail the request if email fails, just log it
