@@ -8,9 +8,11 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+const smtpPort = Number(process.env.SMTP_PORT) || 2525;
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'mail.smtp2go.com',
-    port: Number(process.env.SMTP_PORT) || 2525,
+    port: smtpPort,
+    secure: smtpPort === 465, // true for 465, false for other ports
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASSWORD,
