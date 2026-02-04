@@ -451,11 +451,8 @@ export function ApplicationForm() {
                         </div>
                     </div>
 
-                </div>
-
-            </form>
-    )
-}
-        </motion.div >
+                </form>
+            )}
+        </motion.div>
     )
 }
