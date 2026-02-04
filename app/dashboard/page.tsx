@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { format } from 'date-fns'
-import { Search, Calendar, ChevronDown, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { Search, Calendar, ChevronDown, CheckCircle, XCircle, Clock, Mail } from 'lucide-react'
 import Image from 'next/image'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -26,8 +26,33 @@ export default function Dashboard() {
     const [leads, setLeads] = useState<Application[]>([])
     const [loading, setLoading] = useState(true)
     const [retrying, setRetrying] = useState<string | null>(null)
+    const [resendingEmail, setResendingEmail] = useState<string | null>(null)
     const [dateFrom, setDateFrom] = useState('')
     const [dateTo, setDateTo] = useState('')
+
+    const handleResendEmail = async (leadId: string) => {
+        setResendingEmail(leadId)
+        try {
+            const res = await fetch('/api/leads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    applicationId: leadId,
+                    skipCrm: true
+                })
+            })
+
+            if (res.ok) {
+                alert("Email resent successfully!")
+            } else {
+                alert("Failed to resend email.")
+            }
+        } catch (e) {
+            console.error(e)
+            alert("Error resending email")
+        }
+        setResendingEmail(null)
+    }
 
     const handleRetry = async (leadId: string) => {
         setRetrying(leadId)
@@ -172,8 +197,8 @@ export default function Dashboard() {
                                             <td className="p-4">
                                                 <div className="flex items-center gap-2">
                                                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${lead.crm_status === 'success'
-                                                            ? 'bg-green-100 text-green-700'
-                                                            : 'bg-red-100 text-red-700'
+                                                        ? 'bg-green-100 text-green-700'
+                                                        : 'bg-red-100 text-red-700'
                                                         }`}>
                                                         {lead.crm_status === 'success' ? (
                                                             <CheckCircle className="w-3 h-3 mr-1" />
@@ -194,6 +219,17 @@ export default function Dashboard() {
                                                             {retrying === lead.id ? '...' : 'Retry'}
                                                         </Button>
                                                     )}
+
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-6 w-6 text-gray-400 hover:text-brand-blue"
+                                                        title="Resend Email Notification"
+                                                        disabled={resendingEmail === lead.id}
+                                                        onClick={() => handleResendEmail(lead.id)}
+                                                    >
+                                                        <Mail className="w-4 h-4" />
+                                                    </Button>
                                                 </div>
                                             </td>
                                             <td className="p-4">

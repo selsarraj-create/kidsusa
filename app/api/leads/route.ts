@@ -69,42 +69,47 @@ export async function POST(request: Request) {
             opt_in: "1"
         };
 
-        console.log("Sending payload to CRM:", payload);
+        let crmStatus = 'skipped';
+        let crmResponse = 'Skipped CRM submission';
 
-        const response = await fetch('https://www.thestudiobookings.online/application/lead/service/importlead-api.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        });
+        // Only send to CRM if not explicitly skipped
+        if (!body.skipCrm) {
+            console.log("Sending payload to CRM:", payload);
 
-        let crmStatus = 'failed';
-        let crmResponse = '';
+            const response = await fetch('https://www.thestudiobookings.online/application/lead/service/importlead-api.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("CRM Webhook Error:", response.status, errorText);
-            crmResponse = `Error ${response.status}: ${errorText.substring(0, 200)}`;
-        } else {
-            const responseData = await response.text(); // PHP might return text or JSON
-            crmStatus = 'success';
-            crmResponse = responseData.substring(0, 200);
-        }
+            crmStatus = 'failed';
 
-        // Update Supabase if we have an ID
-        if (payloadData.applicationId) {
-            await supabase
-                .from('applications')
-                .update({
-                    crm_status: crmStatus,
-                    crm_response: crmResponse
-                })
-                .eq('id', payloadData.applicationId);
-        }
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("CRM Webhook Error:", response.status, errorText);
+                crmResponse = `Error ${response.status}: ${errorText.substring(0, 200)}`;
+            } else {
+                const responseData = await response.text(); // PHP might return text or JSON
+                crmStatus = 'success';
+                crmResponse = responseData.substring(0, 200);
+            }
 
-        if (crmStatus === 'failed') {
-            return NextResponse.json({ error: "Failed to send to CRM", details: crmResponse }, { status: 400 });
+            // Update Supabase if we have an ID (Only update CRM status if we actually tried)
+            if (payloadData.applicationId) {
+                await supabase
+                    .from('applications')
+                    .update({
+                        crm_status: crmStatus,
+                        crm_response: crmResponse
+                    })
+                    .eq('id', payloadData.applicationId);
+            }
+
+            if (crmStatus === 'failed') {
+                return NextResponse.json({ error: "Failed to send to CRM", details: crmResponse }, { status: 400 });
+            }
         }
 
         // Send Email Notification
