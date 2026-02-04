@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
-import crypto from 'crypto';
+import nodeCrypto from 'crypto';
 
 // Use Service Role to bypass RLS for updates
 const supabase = createClient(
