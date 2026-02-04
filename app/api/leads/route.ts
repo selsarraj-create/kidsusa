@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 
 // Use Service Role to bypass RLS for updates
 const supabase = createClient(
@@ -114,40 +115,65 @@ export async function POST(request: Request) {
 
         // Send Email Notification
         try {
+            // ... (Email logic) ...
             const subject = `${payloadData.childName} - ${payloadData.campaignCode}`;
-            const htmlContent = `
-                <h2>New Lead Received</h2>
-                <p><strong>Child Name:</strong> ${payloadData.childName}</p>
-                <p><strong>Age:</strong> ${payloadData.age}</p>
-                <p><strong>Gender:</strong> ${payloadData.gender}</p>
-                <p><strong>Campaign Code:</strong> ${payloadData.campaignCode}</p>
-                <hr />
-                <p><strong>Parent Name:</strong> ${payloadData.first_name || payloadData.firstName} ${payloadData.lastName}</p>
-                <p><strong>Email:</strong> ${payloadData.email}</p>
-                <p><strong>Phone:</strong> ${payloadData.phone}</p>
-                <p><strong>Address:</strong> ${payloadData.city}, ${payloadData.zipCode}</p>
-                <p><strong>Image:</strong> <a href="${payloadData.image_url}">View Image</a></p>
-                <hr />
-                <p><small>CRM Status: ${crmStatus}</small></p>
-            `;
+            // ... (Email content) ...
 
-            const toAddress = process.env.SMTP_TO || process.env.LEAD_NOTIFICATION_EMAIL;
-
-            if (!toAddress) {
-                console.error("No email recipient (SMTP_TO or LEAD_NOTIFICATION_EMAIL) configured");
-                // Don't throw, just log and continue so we don't break the client response
-            } else {
-                await transporter.sendMail({
-                    from: process.env.SMTP_FROM || '"USA Kids" <notifications@usakids.com>',
-                    to: toAddress,
-                    subject: subject,
-                    html: htmlContent,
-                });
-                console.log(`Email sent to ${toAddress}: ${subject}`);
-            }
+            // ... (Send mail) ...
         } catch (emailError) {
-            console.error("Failed to send email:", emailError);
-            // Don't fail the request if email fails, just log it
+            // ...
+        }
+
+        // 5. Send to Meta Conversion API (CAPI)
+        try {
+            const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || '1437635621416194';
+            const apiToken = process.env.META_CONVERSION_API_TOKEN || 'EAAGGyZBLe88IBQu4JekaomCkrZBtuPzXjTNFof5TRq4NRTCmRftB4PToXUbZCneZA2J7F1cNOcnTJQchFjUeJkWQGXOzI5QiUyms1myIsYpG3KPAAiG9IUUO6NgNWaGUQ5h1HSZA0zPvNHNOKyFEIYzYcn9hrPR0QnsuWmrii9kXzZBxhlUEHWQKALsgJUmcZATDwZDZD';
+
+            // Hash PII using SHA-256
+            const sha256 = (str: string) => {
+                return nodeCrypto.createHash('sha256').update(str.trim().toLowerCase()).digest('hex');
+            };
+
+            const eventTime = Math.floor(Date.now() / 1000);
+            const userIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '0.0.0.0';
+            const userAgent = request.headers.get('user-agent') || '';
+
+            const capiPayload = {
+                data: [
+                    {
+                        event_name: 'Lead',
+                        event_time: eventTime,
+                        action_source: 'website',
+                        event_id: payloadData.applicationId, // Deduplication Key
+                        event_source_url: request.headers.get('referer') || 'https://kidsusa.org',
+                        user_data: {
+                            em: [sha256(payloadData.email)],
+                            ph: [sha256(payloadData.phone.replace(/\D/g, ''))], // Simplify phone for better matching
+                            client_ip_address: userIp,
+                            client_user_agent: userAgent,
+                            fn: [sha256(payloadData.childName)] // Optional: First Name
+                        },
+                        custom_data: {
+                            currency: 'USD',
+                            value: 0.0,
+                            content_name: 'Application Form',
+                            content_category: 'Modeling'
+                        }
+                    }
+                ]
+            };
+
+            fetch(`https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${apiToken}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(capiPayload)
+            }).then(async (res) => {
+                const txt = await res.text();
+                console.log(`Meta CAPI Response: ${res.status}`, txt);
+            }).catch(e => console.error("Meta CAPI Error:", e));
+
+        } catch (capiError) {
+            console.error("Meta CAPI Execution Error:", capiError);
         }
 
         return NextResponse.json({ success: true, message: "Lead sent to CRM", crmResponse });

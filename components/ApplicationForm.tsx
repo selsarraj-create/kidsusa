@@ -214,6 +214,17 @@ export function ApplicationForm() {
 
             // 4. Send to CRM (Fire and Forget - don't block success UI)
             try {
+                // Track Pixel Lead
+                import("react-facebook-pixel")
+                    .then((x) => x.default)
+                    .then((ReactPixel) => {
+                        ReactPixel.track('Lead', {
+                            content_name: 'Application Form',
+                            content_category: 'Modeling',
+                            status: 'success'
+                        })
+                    })
+
                 fetch('/api/leads', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
