@@ -37,6 +37,8 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 export function ApplicationForm() {
+    const [isSubmitted, setIsSubmitted] = React.useState(false)
+
     const {
         register,
         handleSubmit,
@@ -243,6 +245,8 @@ export function ApplicationForm() {
                 description: "We will be in touch shortly."
             })
 
+            setIsSubmitted(true)
+
         } catch (error: any) {
             console.error("Submission failed:", error)
             const msg = error.message || "Something went wrong. Please try again."
@@ -277,152 +281,181 @@ export function ApplicationForm() {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4">
-
-                {/* Child's Name & Gender */}
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                        <Input
-                            {...register('childName')}
-                            placeholder="Child's Name"
-                            icon={<User className="w-5 h-5" />}
-                            className={cn("bg-white/70", errors.childName && "border-red-500 ring-red-500")}
-                        />
-                        {errors.childName && <p className="ml-1 text-xs font-bold text-red-500">{errors.childName.message}</p>}
+            {isSubmitted ? (
+                <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="flex flex-col items-center justify-center py-12 text-center space-y-4"
+                >
+                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                        <ShieldCheck className="w-10 h-10 text-green-600" />
                     </div>
-                    <div className="space-y-1">
-                        <select
-                            {...register('gender')}
-                            className={cn(
-                                "flex h-12 w-full appearance-none rounded-2xl border-2 border-white/40 bg-white/70 px-4 py-2 text-base text-gray-900 shadow-sm focus-visible:border-brand-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:opacity-50 transition-colors focus:bg-white",
-                                errors.gender && "border-red-500 ring-red-500"
-                            )}
-                            defaultValue=""
-                        >
-                            <option value="" disabled>Gender</option>
-                            <option value="M">Boy</option>
-                            <option value="F">Girl</option>
-                        </select>
-                        {errors.gender && <p className="ml-1 text-xs font-bold text-red-500">{errors.gender.message}</p>}
-                    </div>
-                </div>
-
-                {/* Parent Name Fields Row */}
-                <label className="text-sm font-bold text-gray-700 ml-1">Parent's Details</label>
-                <div className="grid grid-cols-2 gap-3 mt-0!">
-                    <div className="space-y-1">
-                        <Input
-                            {...register('firstName')}
-                            placeholder="Parent First Name"
-                            icon={<User className="w-5 h-5" />}
-                            className={cn("bg-white/70", errors.firstName && "border-red-500 ring-red-500")}
-                        />
-                        {errors.firstName && <p className="ml-1 text-xs font-bold text-red-500">{errors.firstName.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Input
-                            {...register('lastName')}
-                            placeholder="Parent Last Name"
-                            icon={<User className="w-5 h-5" />}
-                            className={cn("bg-white/70", errors.lastName && "border-red-500 ring-red-500")}
-                        />
-                        {errors.lastName && <p className="ml-1 text-xs font-bold text-red-500">{errors.lastName.message}</p>}
-                    </div>
-                </div>
-
-                {/* Email Field */}
-                <div className="space-y-1">
-                    <Input
-                        {...register('email')}
-                        type="email"
-                        placeholder="Email Address"
-                        icon={<span className="font-bold text-gray-400">@</span>}
-                        className={cn("bg-white/70", errors.email && "border-red-500 ring-red-500")}
-                    />
-                    {errors.email && <p className="ml-1 text-xs font-bold text-red-500">{errors.email.message}</p>}
-                </div>
-
-                {/* Age & Zip Code Row */}
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                        <div className="relative">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-pink/60 pointer-events-none z-10">
-                                <Calendar className="w-5 h-5" />
-                            </div>
-                            <select
-                                className={cn(
-                                    "flex h-12 w-full appearance-none rounded-2xl border-2 border-white/40 bg-white/70 pl-11 pr-4 py-2 text-base text-gray-900 shadow-sm focus-visible:border-brand-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:opacity-50 transition-colors focus:bg-white",
-                                    errors.age && "border-red-500 ring-red-500"
-                                )}
-                                {...register('age')}
-                                defaultValue="3" // Start default at 3 per user request
-                            >
-                                <option value="" disabled>Age</option>
-                                {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((age) => (
-                                    <option key={age} value={age}>{age} Years</option>
-                                ))}
-                            </select>
-                            <ChevronRight className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-gray-500" />
-                        </div>
-                        {errors.age && <p className="ml-1 text-xs font-bold text-red-500">{errors.age.message}</p>}
-                    </div>
-
-                    <div className="space-y-1">
-                        <Input
-                            {...register('zipCode')}
-                            onChange={handleZipCodeChange}
-                            placeholder="Zip Code"
-                            icon={<MapPin className="w-5 h-5" />}
-                            className={cn("bg-white/70", errors.zipCode && "border-red-500 ring-red-500")}
-                        />
-                        {errors.zipCode && <p className="ml-1 text-xs font-bold text-red-500">{errors.zipCode.message}</p>}
-                    </div>
-                </div>
-
-                {/* Phone */}
-                <div className="space-y-1">
-                    <Input
-                        {...register('phone')}
-                        type="tel"
-                        onChange={handlePhoneChange}
-                        placeholder="Phone Number (555) 555-5555"
-                        icon={<Phone className="w-5 h-5" />}
-                        className={cn("bg-white/70", errors.phone && "border-red-500 ring-red-500")}
-                    />
-                    {errors.phone && <p className="ml-1 text-xs font-bold text-red-500">{errors.phone.message}</p>}
-                </div>
-
-                {/* Image Upload */}
-                <div className="space-y-1">
-                    <label className="ml-1 text-sm font-bold text-gray-700">Photo Upload</label>
-                    <p className="ml-1 text-xs text-gray-500 mb-1">Showcase personality! Natural light preferred.</p>
-                    <ImageUpload
-                        value={imageValue}
-                        onChange={(file) => setValue('image', file as any, { shouldValidate: true })}
-                        className={cn(errors.image && "ring-2 ring-red-500 rounded-2xl")}
-                    />
-                    {errors.image && <p className="ml-1 text-xs font-bold text-red-500">{errors.image.message}</p>}
-                </div>
-
-                {/* Submit Button */}
-                <div className="pt-2">
+                    <h3 className="text-3xl font-black text-gray-900 tracking-tight">Application Received!</h3>
+                    <p className="text-lg text-gray-600 max-w-sm mx-auto">
+                        Thank you for applying! We have received your details safely.
+                    </p>
+                    <p className="text-gray-500 text-sm">
+                        You can close this page now.
+                    </p>
                     <Button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full text-lg shadow-brand-pink/40"
-                        variant="primary"
-                        size="lg"
+                        onClick={() => window.location.reload()}
+                        variant="ghost"
+                        className="mt-6 text-brand-blue"
                     >
-                        {isSubmitting ? "Sending..." : "Submit Application"}
+                        Submit another child
                     </Button>
+                </motion.div>
+            ) : (
+                <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4">
 
-                    <div className="mt-3 flex items-center justify-center gap-2 text-xs font-medium text-gray-500">
-                        <Lock className="h-3 w-3 text-green-600" />
-                        <span>SSL Encrypted. Your data is private.</span>
+                    {/* Child's Name & Gender */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                            <Input
+                                {...register('childName')}
+                                placeholder="Child's Name"
+                                icon={<User className="w-5 h-5" />}
+                                className={cn("bg-white/70", errors.childName && "border-red-500 ring-red-500")}
+                            />
+                            {errors.childName && <p className="ml-1 text-xs font-bold text-red-500">{errors.childName.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <select
+                                {...register('gender')}
+                                className={cn(
+                                    "flex h-12 w-full appearance-none rounded-2xl border-2 border-white/40 bg-white/70 px-4 py-2 text-base text-gray-900 shadow-sm focus-visible:border-brand-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:opacity-50 transition-colors focus:bg-white",
+                                    errors.gender && "border-red-500 ring-red-500"
+                                )}
+                                defaultValue=""
+                            >
+                                <option value="" disabled>Gender</option>
+                                <option value="M">Boy</option>
+                                <option value="F">Girl</option>
+                            </select>
+                            {errors.gender && <p className="ml-1 text-xs font-bold text-red-500">{errors.gender.message}</p>}
+                        </div>
                     </div>
+
+                    {/* Parent Name Fields Row */}
+                    <label className="text-sm font-bold text-gray-700 ml-1">Parent's Details</label>
+                    <div className="grid grid-cols-2 gap-3 mt-0!">
+                        <div className="space-y-1">
+                            <Input
+                                {...register('firstName')}
+                                placeholder="Parent First Name"
+                                icon={<User className="w-5 h-5" />}
+                                className={cn("bg-white/70", errors.firstName && "border-red-500 ring-red-500")}
+                            />
+                            {errors.firstName && <p className="ml-1 text-xs font-bold text-red-500">{errors.firstName.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Input
+                                {...register('lastName')}
+                                placeholder="Parent Last Name"
+                                icon={<User className="w-5 h-5" />}
+                                className={cn("bg-white/70", errors.lastName && "border-red-500 ring-red-500")}
+                            />
+                            {errors.lastName && <p className="ml-1 text-xs font-bold text-red-500">{errors.lastName.message}</p>}
+                        </div>
+                    </div>
+
+                    {/* Email Field */}
+                    <div className="space-y-1">
+                        <Input
+                            {...register('email')}
+                            type="email"
+                            placeholder="Email Address"
+                            icon={<span className="font-bold text-gray-400">@</span>}
+                            className={cn("bg-white/70", errors.email && "border-red-500 ring-red-500")}
+                        />
+                        {errors.email && <p className="ml-1 text-xs font-bold text-red-500">{errors.email.message}</p>}
+                    </div>
+
+                    {/* Age & Zip Code Row */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                            <div className="relative">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-pink/60 pointer-events-none z-10">
+                                    <Calendar className="w-5 h-5" />
+                                </div>
+                                <select
+                                    className={cn(
+                                        "flex h-12 w-full appearance-none rounded-2xl border-2 border-white/40 bg-white/70 pl-11 pr-4 py-2 text-base text-gray-900 shadow-sm focus-visible:border-brand-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue disabled:opacity-50 transition-colors focus:bg-white",
+                                        errors.age && "border-red-500 ring-red-500"
+                                    )}
+                                    {...register('age')}
+                                    defaultValue="3" // Start default at 3 per user request
+                                >
+                                    <option value="" disabled>Age</option>
+                                    {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((age) => (
+                                        <option key={age} value={age}>{age} Years</option>
+                                    ))}
+                                </select>
+                                <ChevronRight className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-gray-500" />
+                            </div>
+                            {errors.age && <p className="ml-1 text-xs font-bold text-red-500">{errors.age.message}</p>}
+                        </div>
+
+                        <div className="space-y-1">
+                            <Input
+                                {...register('zipCode')}
+                                onChange={handleZipCodeChange}
+                                placeholder="Zip Code"
+                                icon={<MapPin className="w-5 h-5" />}
+                                className={cn("bg-white/70", errors.zipCode && "border-red-500 ring-red-500")}
+                            />
+                            {errors.zipCode && <p className="ml-1 text-xs font-bold text-red-500">{errors.zipCode.message}</p>}
+                        </div>
+                    </div>
+
+                    {/* Phone */}
+                    <div className="space-y-1">
+                        <Input
+                            {...register('phone')}
+                            type="tel"
+                            onChange={handlePhoneChange}
+                            placeholder="Phone Number (555) 555-5555"
+                            icon={<Phone className="w-5 h-5" />}
+                            className={cn("bg-white/70", errors.phone && "border-red-500 ring-red-500")}
+                        />
+                        {errors.phone && <p className="ml-1 text-xs font-bold text-red-500">{errors.phone.message}</p>}
+                    </div>
+
+                    {/* Image Upload */}
+                    <div className="space-y-1">
+                        <label className="ml-1 text-sm font-bold text-gray-700">Photo Upload</label>
+                        <p className="ml-1 text-xs text-gray-500 mb-1">Showcase personality! Natural light preferred.</p>
+                        <ImageUpload
+                            value={imageValue}
+                            onChange={(file) => setValue('image', file as any, { shouldValidate: true })}
+                            className={cn(errors.image && "ring-2 ring-red-500 rounded-2xl")}
+                        />
+                        {errors.image && <p className="ml-1 text-xs font-bold text-red-500">{errors.image.message}</p>}
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="pt-2">
+                        <Button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full text-lg shadow-brand-pink/40"
+                            variant="primary"
+                            size="lg"
+                        >
+                            {isSubmitting ? "Sending..." : "Submit Application"}
+                        </Button>
+
+                        <div className="mt-3 flex items-center justify-center gap-2 text-xs font-medium text-gray-500">
+                            <Lock className="h-3 w-3 text-green-600" />
+                            <span>SSL Encrypted. Your data is private.</span>
+                        </div>
+                    </div>
+
                 </div>
 
             </form>
-        </motion.div>
+    )
+}
+        </motion.div >
     )
 }
