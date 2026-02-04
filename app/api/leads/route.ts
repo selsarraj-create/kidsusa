@@ -1,11 +1,21 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import nodemailer from 'nodemailer';
 
 // Use Service Role to bypass RLS for updates
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
+
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'mail.smtp2go.com',
+    port: Number(process.env.SMTP_PORT) || 2525,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD,
+    },
+});
 
 export async function POST(request: Request) {
     try {
@@ -93,6 +103,37 @@ export async function POST(request: Request) {
 
         if (crmStatus === 'failed') {
             return NextResponse.json({ error: "Failed to send to CRM", details: crmResponse }, { status: 400 });
+        }
+
+        // Send Email Notification
+        try {
+            const subject = `${payloadData.childName} - ${payloadData.campaignCode}`;
+            const htmlContent = `
+                <h2>New Lead Received</h2>
+                <p><strong>Child Name:</strong> ${payloadData.childName}</p>
+                <p><strong>Age:</strong> ${payloadData.age}</p>
+                <p><strong>Gender:</strong> ${payloadData.gender}</p>
+                <p><strong>Campaign Code:</strong> ${payloadData.campaignCode}</p>
+                <hr />
+                <p><strong>Parent Name:</strong> ${payloadData.first_name || payloadData.firstName} ${payloadData.lastName}</p>
+                <p><strong>Email:</strong> ${payloadData.email}</p>
+                <p><strong>Phone:</strong> ${payloadData.phone}</p>
+                <p><strong>Address:</strong> ${payloadData.city}, ${payloadData.zipCode}</p>
+                <p><strong>Image:</strong> <a href="${payloadData.image_url}">View Image</a></p>
+                <hr />
+                <p><small>CRM Status: ${crmStatus}</small></p>
+            `;
+
+            await transporter.sendMail({
+                from: process.env.SMTP_FROM || '"USA Kids" <notifications@usakids.com>',
+                to: process.env.SMTP_TO,
+                subject: subject,
+                html: htmlContent,
+            });
+            console.log(`Email sent: ${subject}`);
+        } catch (emailError) {
+            console.error("Failed to send email:", emailError);
+            // Don't fail the request if email fails, just log it
         }
 
         return NextResponse.json({ success: true, message: "Lead sent to CRM", crmResponse });

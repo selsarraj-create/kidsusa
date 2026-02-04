@@ -24,18 +24,35 @@ begin
   alter table public.applications add column if not exists crm_status text default 'pending';
   alter table public.applications add column if not exists crm_response text null;
 end;
-end;
 $$;
 
 -- Add Unique Constraints to prevent duplicates
 do $$
 begin
-  -- Email unique constraint
+  -- 1. Deduplicate Email (Keep latest)
+  delete from public.applications a
+  using (
+      select id, row_number() over (partition by email order by created_at desc) as rn
+      from public.applications
+      where email is not null
+  ) dup
+  where a.id = dup.id and dup.rn > 1;
+
+  -- 2. Deduplicate Phone (Keep latest)
+  delete from public.applications a
+  using (
+      select id, row_number() over (partition by phone order by created_at desc) as rn
+      from public.applications
+      where phone is not null
+  ) dup
+  where a.id = dup.id and dup.rn > 1;
+
+  -- 3. Add Email unique constraint
   if not exists (select 1 from pg_constraint where conname = 'applications_email_key') then
     alter table public.applications add constraint applications_email_key unique (email);
   end if;
 
-  -- Phone unique constraint
+  -- 4. Add Phone unique constraint
   if not exists (select 1 from pg_constraint where conname = 'applications_phone_key') then
     alter table public.applications add constraint applications_phone_key unique (phone);
   end if;
@@ -55,6 +72,7 @@ create policy "Allow public inserts"
   with check (true);
 
 -- Create policy to allow reading (Required for Dashboard)
+drop policy if exists "Allow public reading" on public.applications;
 create policy "Allow public reading"
   on public.applications
   for select
