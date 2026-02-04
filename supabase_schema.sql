@@ -24,7 +24,22 @@ begin
   alter table public.applications add column if not exists crm_status text default 'pending';
   alter table public.applications add column if not exists crm_response text null;
 end;
+end;
 $$;
+
+-- Add Unique Constraints to prevent duplicates
+do $$
+begin
+  -- Email unique constraint
+  if not exists (select 1 from pg_constraint where conname = 'applications_email_key') then
+    alter table public.applications add constraint applications_email_key unique (email);
+  end if;
+
+  -- Phone unique constraint
+  if not exists (select 1 from pg_constraint where conname = 'applications_phone_key') then
+    alter table public.applications add constraint applications_phone_key unique (phone);
+  end if;
+end $$;
 
 -- Turn on Row Level Security (RLS)
 alter table public.applications enable row level security;

@@ -193,6 +193,10 @@ export function ApplicationForm() {
 
             if (dbError) {
                 console.error("Database error:", dbError)
+                if (dbError.code === '23505') {
+                    // Unique constraint violation code
+                    throw new Error("Application already exists for this email or phone number.")
+                }
                 throw new Error("Failed to save application")
             }
 
@@ -239,9 +243,12 @@ export function ApplicationForm() {
                 description: "We will be in touch shortly."
             })
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("Submission failed:", error)
-            toast.error("Something went wrong. Please try again.")
+            const msg = error.message || "Something went wrong. Please try again."
+            toast.error(msg, {
+                duration: 5000
+            })
         }
     }
 
