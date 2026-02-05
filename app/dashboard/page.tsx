@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { format } from 'date-fns'
-import { Search, Calendar, ChevronDown, CheckCircle, XCircle, Clock, Mail } from 'lucide-react'
+import { Search, Calendar, ChevronDown, CheckCircle, XCircle, Clock, Mail, Send } from 'lucide-react'
 import Image from 'next/image'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -27,8 +27,42 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true)
     const [retrying, setRetrying] = useState<string | null>(null)
     const [resendingEmail, setResendingEmail] = useState<string | null>(null)
+    const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set())
+    const [bulkSending, setBulkSending] = useState(false)
+    const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 })
     const [dateFrom, setDateFrom] = useState('')
     const [dateTo, setDateTo] = useState('')
+
+    const handleBulkEmailSend = async () => {
+        const selectedArray = Array.from(selectedLeads)
+        setBulkSending(true)
+        setBulkProgress({ current: 0, total: selectedArray.length })
+
+        for (let i = 0; i < selectedArray.length; i++) {
+            try {
+                await fetch('/api/leads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        applicationId: selectedArray[i],
+                        skipCrm: true
+                    })
+                })
+                setBulkProgress({ current: i + 1, total: selectedArray.length })
+
+                // Wait 5 seconds before next email (except for the last one)
+                if (i < selectedArray.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 5000))
+                }
+            } catch (e) {
+                console.error('Failed to send email for lead:', selectedArray[i], e)
+            }
+        }
+
+        setBulkSending(false)
+        setSelectedLeads(new Set())
+        alert(`Successfully sent ${selectedArray.length} emails!`)
+    }
 
     const handleResendEmail = async (leadId: string) => {
         setResendingEmail(leadId)
@@ -52,6 +86,24 @@ export default function Dashboard() {
             alert("Error resending email")
         }
         setResendingEmail(null)
+    }
+
+    const toggleSelectLead = (leadId: string) => {
+        const newSelected = new Set(selectedLeads)
+        if (newSelected.has(leadId)) {
+            newSelected.delete(leadId)
+        } else {
+            newSelected.add(leadId)
+        }
+        setSelectedLeads(newSelected)
+    }
+
+    const toggleSelectAll = () => {
+        if (selectedLeads.size === leads.length) {
+            setSelectedLeads(new Set())
+        } else {
+            setSelectedLeads(new Set(leads.map(l => l.id)))
+        }
     }
 
     const handleRetry = async (leadId: string) => {
@@ -136,6 +188,16 @@ export default function Dashboard() {
                             />
                         </div>
                         <Button onClick={fetchLeads} variant="outline" className="h-full">Refresh</Button>
+                        {selectedLeads.size > 0 && (
+                            <Button
+                                onClick={handleBulkEmailSend}
+                                disabled={bulkSending}
+                                className="h-full bg-brand-blue hover:bg-brand-blue/90"
+                            >
+                                <Send className="w-4 h-4 mr-2" />
+                                {bulkSending ? `Sending ${bulkProgress.current}/${bulkProgress.total}...` : `Send ${selectedLeads.size} Emails`}
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -153,6 +215,14 @@ export default function Dashboard() {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-gray-50/50 border-b border-gray-100">
+                                    <th className="p-4 text-left">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedLeads.size === leads.length && leads.length > 0}
+                                            onChange={toggleSelectAll}
+                                            className="w-4 h-4 rounded border-gray-300 text-brand-blue focus:ring-brand-blue"
+                                        />
+                                    </th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Applicant</th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Age</th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Contact</th>
@@ -164,15 +234,23 @@ export default function Dashboard() {
                             <tbody className="divide-y divide-gray-50">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={5} className="p-8 text-center text-gray-500">Loading leads...</td>
+                                        <td colSpan={7} className="p-8 text-center text-gray-500">Loading leads...</td>
                                     </tr>
                                 ) : leads.length === 0 ? (
                                     <tr>
-                                        <td colSpan={5} className="p-8 text-center text-gray-500">No leads found for this period.</td>
+                                        <td colSpan={7} className="p-8 text-center text-gray-500">No leads found for this period.</td>
                                     </tr>
                                 ) : (
                                     leads.map((lead) => (
                                         <tr key={lead.id} className="hover:bg-gray-50 transition-colors group">
+                                            <td className="p-4">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedLeads.has(lead.id)}
+                                                    onChange={() => toggleSelectLead(lead.id)}
+                                                    className="w-4 h-4 rounded border-gray-300 text-brand-blue focus:ring-brand-blue"
+                                                />
+                                            </td>
                                             <td className="p-4">
                                                 <div className="font-bold text-gray-900">{lead.first_name} {lead.last_name}</div>
                                                 <div className="text-xs text-gray-400 font-mono">{lead.id.slice(0, 8)}...</div>
