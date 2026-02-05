@@ -12,6 +12,7 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
+    const [preview, setPreview] = useState<string | null>(null)
     const [isConverting, setIsConverting] = useState(false)
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
