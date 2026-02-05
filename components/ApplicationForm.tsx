@@ -214,16 +214,14 @@ export function ApplicationForm() {
 
             // 4. Send to CRM (Fire and Forget - don't block success UI)
             try {
-                // Track Pixel Lead
-                import("react-facebook-pixel")
-                    .then((x) => x.default)
-                    .then((ReactPixel) => {
-                        ReactPixel.track('Lead', {
-                            content_name: 'Application Form',
-                            content_category: 'Modeling',
-                            status: 'success'
-                        })
-                    })
+                // Track Pixel Lead with EventID for Deduplication
+                if (typeof window.fbq !== 'undefined') {
+                    window.fbq('track', 'Lead', {
+                        content_name: 'Application Form',
+                        content_category: 'Modeling',
+                        status: 'success'
+                    }, { eventID: applicationId })
+                }
 
                 fetch('/api/leads', {
                     method: 'POST',
