@@ -115,13 +115,39 @@ export async function POST(request: Request) {
 
         // Send Email Notification
         try {
-            // ... (Email logic) ...
             const subject = `${payloadData.childName} - ${payloadData.campaignCode}`;
-            // ... (Email content) ...
+            const htmlContent = `
+                <h2>New Lead Received</h2>
+                <p><strong>Child Name:</strong> ${payloadData.childName}</p>
+                <p><strong>Age:</strong> ${payloadData.age}</p>
+                <p><strong>Gender:</strong> ${payloadData.gender}</p>
+                <p><strong>Campaign Code:</strong> ${payloadData.campaignCode}</p>
+                <hr />
+                <p><strong>Parent Name:</strong> ${payloadData.first_name || payloadData.firstName} ${payloadData.lastName}</p>
+                <p><strong>Email:</strong> ${payloadData.email}</p>
+                <p><strong>Phone:</strong> ${payloadData.phone}</p>
+                <p><strong>Address:</strong> ${payloadData.city}, ${payloadData.zipCode}</p>
+                <p><strong>Image:</strong> <a href="${payloadData.image_url}">View Image</a></p>
+                <hr />
+                <p><small>CRM Status: ${crmStatus}</small></p>
+            `;
 
-            // ... (Send mail) ...
+            const toAddress = process.env.SMTP_TO || process.env.LEAD_NOTIFICATION_EMAIL;
+
+            if (!toAddress) {
+                console.error("No email recipient (SMTP_TO or LEAD_NOTIFICATION_EMAIL) configured");
+            } else {
+                await transporter.sendMail({
+                    from: process.env.SMTP_FROM || '"USA Kids" <notifications@usakids.com>',
+                    to: toAddress,
+                    subject: subject,
+                    html: htmlContent,
+                });
+                console.log(`Email sent to ${toAddress}: ${subject}`);
+            }
         } catch (emailError) {
-            // ...
+            console.error("Failed to send email:", emailError);
+            // Don't fail the request if email fails, just log it
         }
 
         // 5. Send to Meta Conversion API (CAPI)
