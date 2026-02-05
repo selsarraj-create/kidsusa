@@ -20,6 +20,7 @@ type Application = {
     status: string
     crm_status?: string
     crm_response?: string
+    campaign_code?: string
 }
 
 export default function Dashboard() {
@@ -224,6 +225,7 @@ export default function Dashboard() {
                                         />
                                     </th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Applicant</th>
+                                    <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Campaign</th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Age</th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Contact</th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Submitted</th>
@@ -234,11 +236,11 @@ export default function Dashboard() {
                             <tbody className="divide-y divide-gray-50">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={7} className="p-8 text-center text-gray-500">Loading leads...</td>
+                                        <td colSpan={8} className="p-8 text-center text-gray-500">Loading leads...</td>
                                     </tr>
                                 ) : leads.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="p-8 text-center text-gray-500">No leads found for this period.</td>
+                                        <td colSpan={8} className="p-8 text-center text-gray-500">No leads found for this period.</td>
                                     </tr>
                                 ) : (
                                     leads.map((lead) => (
@@ -254,6 +256,11 @@ export default function Dashboard() {
                                             <td className="p-4">
                                                 <div className="font-bold text-gray-900">{lead.first_name} {lead.last_name}</div>
                                                 <div className="text-xs text-gray-400 font-mono">{lead.id.slice(0, 8)}...</div>
+                                            </td>
+                                            <td className="p-4">
+                                                <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-purple-100 text-purple-800">
+                                                    {lead.campaign_code || 'N/A'}
+                                                </span>
                                             </td>
                                             <td className="p-4">
                                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
