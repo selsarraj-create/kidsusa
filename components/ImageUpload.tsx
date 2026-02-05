@@ -12,13 +12,44 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
-    const [preview, setPreview] = useState<string | null>(null)
+    const [isConverting, setIsConverting] = useState(false)
 
-    const onDrop = useCallback((acceptedFiles: File[]) => {
+    const onDrop = useCallback(async (acceptedFiles: File[]) => {
         const file = acceptedFiles[0]
         if (file) {
-            onChange(file)
-            setPreview(URL.createObjectURL(file))
+            // Check for HEIC file (by type or extension)
+            if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+                setIsConverting(true)
+                try {
+                    const heic2any = (await import('heic2any')).default
+                    const convertedBlob = await heic2any({
+                        blob: file,
+                        toType: 'image/jpeg',
+                        quality: 0.8
+                    })
+
+                    // Handle single blob or array of blobs (though strictly we expect single here for one file)
+                    const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob
+
+                    const convertedFile = new File(
+                        [blob],
+                        file.name.replace(/\.heic$/i, '.jpg'),
+                        { type: 'image/jpeg' }
+                    )
+
+                    onChange(convertedFile)
+                    setPreview(URL.createObjectURL(convertedFile))
+                } catch (error) {
+                    console.error("HEIC conversion failed:", error)
+                    alert("Could not convert HEIC image. Please try a JPEG or PNG.")
+                } finally {
+                    setIsConverting(false)
+                }
+            } else {
+                // Standard handling for non-HEIC
+                onChange(file)
+                setPreview(URL.createObjectURL(file))
+            }
         }
     }, [onChange])
 
@@ -31,10 +62,11 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         accept: {
-            'image/*': []
+            'image/*': ['.jpeg', '.jpg', '.png', '.heic']
         },
         maxFiles: 1,
-        multiple: false
+        multiple: false,
+        disabled: isConverting
     })
 
     return (
@@ -88,7 +120,7 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
                             </div>
                             <div className="space-y-1">
                                 <p className="text-base font-bold text-gray-900">
-                                    Tap to upload or take a photo
+                                    {isConverting ? "Converting HEIC..." : "Tap to upload or take a photo"}
                                 </p>
                                 <p className="text-xs text-gray-500 max-w-[200px] mx-auto leading-tight">
                                     Snap a clear, front-facing photo or choose one from your gallery. No filters needed!
@@ -96,7 +128,7 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
                             </div>
                             <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-medium text-gray-500 shadow-sm border border-gray-100">
                                 <ImageIcon className="h-3 w-3" />
-                                <span>Supports JPG, PNG</span>
+                                <span>Supports JPG, PNG, HEIC</span>
                             </div>
                         </div>
                     )}
