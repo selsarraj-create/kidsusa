@@ -60,6 +60,7 @@ export function ApplicationForm() {
         { code: '#NYKIDS', name: 'New York', lat: 40.7128, lon: -74.0060 },
         { code: '#BOSKIDS', name: 'Boston', lat: 42.3601, lon: -71.0589 },
         { code: '#FLKIDS', name: 'Miami', lat: 25.7617, lon: -80.1918 },
+        { code: '#ORLKIDS', name: 'Orlando', lat: 28.5384, lon: -81.3789 },
         { code: '#NAKIDS', name: 'Nashville', lat: 36.1627, lon: -86.7816 },
         { code: '#CHIKIDS', name: 'Chicago', lat: 41.8781, lon: -87.6298 },
         { code: '#HOUKIDS', name: 'Houston', lat: 29.7604, lon: -95.3698 },
