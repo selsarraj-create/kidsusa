@@ -124,24 +124,38 @@ export function ApplicationForm() {
                     const lat = parseFloat(place.latitude)
                     const lon = parseFloat(place.longitude)
                     const cityName = place['place name']
+                    const stateAbbr = place['state abbreviation']
 
                     // Set hidden city field
                     setValue('city', cityName)
 
-                    // Find closest campaign city
-                    let minDistance = Infinity
-                    let closestCode = ''
+                    // State-based overrides (bypass proximity)
+                    const STATE_OVERRIDES: Record<string, string> = {
+                        'CT': '#BOSKIDS', // Connecticut
+                        'MA': '#BOSKIDS', // Massachusetts
+                        'NH': '#BOSKIDS', // New Hampshire
+                        'RI': '#BOSKIDS', // Rhode Island
+                    }
 
-                    CAMPAIGN_CITIES.forEach(city => {
-                        const distance = getDistanceFromLatLonInKm(lat, lon, city.lat, city.lon)
-                        if (distance < minDistance) {
-                            minDistance = distance
-                            closestCode = city.code
-                        }
-                    })
+                    if (STATE_OVERRIDES[stateAbbr]) {
+                        console.log(`Zip: ${val} (${stateAbbr}) -> Override: ${STATE_OVERRIDES[stateAbbr]}`)
+                        setValue('campaignCode', STATE_OVERRIDES[stateAbbr])
+                    } else {
+                        // Find closest campaign city
+                        let minDistance = Infinity
+                        let closestCode = ''
 
-                    console.log(`Zip: ${val} -> Closest: ${closestCode} (${Math.round(minDistance)}km)`)
-                    setValue('campaignCode', closestCode)
+                        CAMPAIGN_CITIES.forEach(city => {
+                            const distance = getDistanceFromLatLonInKm(lat, lon, city.lat, city.lon)
+                            if (distance < minDistance) {
+                                minDistance = distance
+                                closestCode = city.code
+                            }
+                        })
+
+                        console.log(`Zip: ${val} -> Closest: ${closestCode} (${Math.round(minDistance)}km)`)
+                        setValue('campaignCode', closestCode)
+                    }
                 }
             } catch (err) {
                 console.error("Failed to lookup zip code:", err)
